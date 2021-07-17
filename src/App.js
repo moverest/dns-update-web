@@ -1,4 +1,4 @@
-import "./App.css";
+import "./App.scss";
 import React from "react";
 
 class App extends React.Component {
@@ -98,7 +98,7 @@ const screens = {
     return <ConnectForm onSubmit={this.updateCredentials} />;
   },
   loading: function () {
-    return <p>Loading...</p>;
+    return <p className="loading">Loading...</p>;
   },
 
   hosts: function () {
@@ -107,17 +107,21 @@ const screens = {
     ));
     return (
       <div>
-        <button onClick={this.logout}>Logout</button>
-        <table>
-          <thead>
-            <tr>
-              <th>Host</th>
-              <th>IPv4</th>
-              <th>IPv6</th>
-            </tr>
-          </thead>
-          <tbody>{hosts}</tbody>
-        </table>
+        <div className="navbar">
+          <button onClick={this.logout}>Logout</button>
+        </div>
+        <div className="content">
+          <table className="host-table">
+            <thead>
+              <tr>
+                <th>Host</th>
+                <th>IPv4</th>
+                <th>IPv6</th>
+              </tr>
+            </thead>
+            <tbody>{hosts}</tbody>
+          </table>
+        </div>
       </div>
     );
   },
@@ -127,7 +131,7 @@ const Host = (props) => {
   const host_url = `https://${props.host.name}`;
   return (
     <tr>
-      <td>
+      <td className="host-name">
         <a href={host_url}>{props.host.name}</a>
       </td>
       <IPInfo ip={props.host.ipv4} />
@@ -137,10 +141,23 @@ const Host = (props) => {
 };
 
 const IPInfo = (props) => (
-  <td>
-    {props.ip.address} ({props.ip.last_ping})
-    <table>
+  <td className="ip-info">
+    <table className="ip-info">
       <tbody>
+        <tr>
+          <th></th>
+          <td className="ip">{props.ip.address}</td>
+        </tr>
+        <tr
+          className={
+            props.ip.last_ping !== _get_current_date_string()
+              ? "warning"
+              : undefined
+          }
+        >
+          <th>Last ping</th>
+          <td> {props.ip.last_ping}</td>
+        </tr>
         <tr>
           <th>Last change</th>
           <td>{props.ip.last_change}</td>
@@ -153,6 +170,10 @@ const IPInfo = (props) => (
     </table>
   </td>
 );
+
+function _get_current_date_string() {
+  return new Date().toISOString().split("T")[0];
+}
 
 class ConnectForm extends React.Component {
   constructor(props) {
@@ -176,36 +197,34 @@ class ConnectForm extends React.Component {
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
-        <label>
-          Base URI
+      <div className="login-container">
+        <form onSubmit={this.handleSubmit}>
+          <label htmlFor="base_uri">Base URI</label>
           <input
             name="base_uri"
             type="text"
             value={this.state.base_uri}
             onChange={this.handleChange}
           />
-        </label>
-        <label>
-          API Key
+          <label htmlFor="api_key">API Key</label>
           <input
             name="api_key"
-            type="text"
+            type="password"
             value={this.state.api_key}
             onChange={this.handleChange}
           />
-        </label>
-        <label>
-          <input
-            name="remember"
-            type="checkbox"
-            value={this.state.remember}
-            onChange={this.handleChange}
-          />
-          Remember me
-        </label>
-        <button type="submit">Connect</button>
-      </form>
+          <label htmlFor="remember">
+            <input
+              name="remember"
+              type="checkbox"
+              value={this.state.remember}
+              onChange={this.handleChange}
+            />
+            Remember me
+          </label>
+          <button type="submit">Connect</button>
+        </form>
+      </div>
     );
   }
 }
