@@ -134,14 +134,23 @@ const Host = (props) => {
       <td className="host-name">
         <a href={host_url}>{props.host.name}</a>
       </td>
-      <IPInfo ip={props.host.ipv4} />
-      <IPInfo ip={props.host.ipv6} />
+      <IPInfo
+        ip={props.host.ipv4}
+        enabled={props.host.ipv4_enabled}
+        type="ipv4"
+      />
+      <IPInfo
+        ip={props.host.ipv6}
+        enabled={props.host.ipv6_enabled}
+        type="ipv6"
+      />
     </tr>
   );
 };
 
-const IPInfo = (props) => (
-  <td className="ip-info">
+const IPInfo = (props) => {
+  const td_class = `ip-info type-${props.type}`;
+  const cell_content = props.enabled ? (
     <table className="ip-info">
       <tbody>
         <tr>
@@ -168,8 +177,11 @@ const IPInfo = (props) => (
         </tr>
       </tbody>
     </table>
-  </td>
-);
+  ) : (
+    <span class="disabled">Disabled</span>
+  );
+  return <td className={td_class}>{cell_content}</td>;
+};
 
 function _get_current_date_string() {
   return new Date().toISOString().split("T")[0];

@@ -112,6 +112,10 @@ p.loading {
     font-weight: bold;
   }
 
+  td.ip-info {
+    text-align: center;
+  }
+
   table.ip-info {
     td {
       padding: 0.1em;
@@ -160,6 +164,18 @@ p.loading {
 
     table.ip-info th {
       text-align: left;
+    }
+
+    td.ip-info.type-ipv4 {
+      > .disabled::before {
+        content: "IPv4 ";
+      }
+    }
+
+    td.ip-info.type-ipv6 {
+      > .disabled::before {
+        content: "IPv6 ";
+      }
     }
 
     .host-name {
