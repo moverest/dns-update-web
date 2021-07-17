@@ -18,6 +18,7 @@ class App extends React.Component {
       hosts: null,
       screen: start_screen,
       credentials: credentials,
+      login_error: null,
     };
   }
 
@@ -35,8 +36,10 @@ class App extends React.Component {
     this.setState(
       (state, props) => ({ credentials: credentials, screen: "loading" }),
       () => {
-        this.refreshHosts().then(() => {
-          this.setState({ screen: "hosts" });
+        this.refreshHosts().then((ok) => {
+          if (ok) {
+            this.setState({ screen: "hosts" });
+          }
         });
       }
     );
@@ -82,9 +85,27 @@ class App extends React.Component {
         },
       }
     )
-      .then((response) => response.json())
+      .then((r) => {
+        if (r.status === 401) {
+          this.setState({
+            login_error: "authentication-error",
+            screen: "login",
+          });
+          return null;
+        }
+        return r.json();
+      })
+      .catch((error) => {
+        this.setState({ login_error: "network-error", screen: "login" });
+        return null;
+      })
       .then((data) => {
-        this.setState({ hosts: data.hosts });
+        if (data !== null) {
+          this.setState({ hosts: data.hosts });
+          return true;
+        }
+
+        return false;
       });
   }
 
@@ -95,7 +116,12 @@ class App extends React.Component {
 
 const screens = {
   login: function () {
-    return <ConnectForm onSubmit={this.updateCredentials} />;
+    return (
+      <ConnectForm
+        onSubmit={this.updateCredentials}
+        error={this.state.login_error}
+      />
+    );
   },
   loading: function () {
     return <p className="loading">Loading...</p>;
@@ -187,10 +213,21 @@ function _get_current_date_string() {
   return new Date().toISOString().split("T")[0];
 }
 
+const LOGIN_ERROR_DESC = {
+  "authentication-error": "Authentication error.",
+  "network-error": "Could not reach service.",
+  "insecure-service-error": "Insecure service. Refusing to connect.",
+};
+
 class ConnectForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { base_uri: "", api_key: "", remember: false };
+    this.state = {
+      base_uri: "",
+      api_key: "",
+      remember: false,
+      error: props.error,
+    };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.onSubmit = props.onSubmit;
@@ -199,15 +236,37 @@ class ConnectForm extends React.Component {
   handleChange(event) {
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
-    this.setState({ [target.name]: value });
+
+    let error = null;
+    if (target.name === "base_uri" && is_uri_insecure(value)) {
+      error = "insecure-service-error";
+    }
+
+    this.setState({ [target.name]: value, error: error });
   }
 
   handleSubmit(event) {
     event.preventDefault();
+
+    if (is_uri_insecure(this.state.base_uri)) {
+      return;
+    }
+
     this.onSubmit(this.state);
   }
 
   render() {
+    let error = "";
+    if (this.state.error !== null) {
+      console.log("error", this.state.error);
+      let error_text = LOGIN_ERROR_DESC[this.state.error];
+      if (error_text === undefined) {
+        error_text = "Error.";
+      }
+
+      error = <div className="error">🛑 {error_text}</div>;
+    }
+
     return (
       <div className="login-container">
         <form onSubmit={this.handleSubmit}>
@@ -235,10 +294,15 @@ class ConnectForm extends React.Component {
             Remember me
           </label>
           <button type="submit">Connect</button>
+          {error}
         </form>
       </div>
     );
   }
+}
+
+function is_uri_insecure(uri) {
+  return uri.startsWith("http:");
 }
 
 export default App;
