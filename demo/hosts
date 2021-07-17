@@ -19,20 +19,22 @@
     },
     "biscuit.example.com": {
       "ipv6_enabled": true,
-      "ipv4_enabled": true,
+      "ipv4_enabled": false,
       "creation": "2021-06-21T21:45:04.927Z",
-      "ipv4": {
-        "address": "127.0.0.2",
-        "cf_dns_record_id": "5df947157612ed039380f38b80ed55e1",
-        "last_change": "2021-06-21T21:45:04.927Z",
-        "last_ping": "2021-07-17"
-      },
+      "ipv4": null,
       "ipv6": {
         "address": "fe80::e432::1",
-        "cf_dns_record_id": "f32df9e8433ffb87a27716824aef9c80",
+        "cf_dns_record_id": "f38b9fbfe28d0a02ebd560e1dfcebbeb",
         "last_change": "2021-06-21T21:45:04.927Z",
         "last_ping": "2021-07-17"
       }
+    },
+    "onion.example.com": {
+      "ipv6_enabled": false,
+      "ipv4_enabled": false,
+      "creation": "2021-06-21T21:45:04.927Z",
+      "ipv4": null,
+      "ipv6": null
     }
   }
 }
