@@ -122,6 +122,7 @@ const screens = {
       <ConnectForm
         onSubmit={this.updateCredentials}
         error={this.state.login_error}
+        credentials={this.state.credentials}
       />
     );
   },
