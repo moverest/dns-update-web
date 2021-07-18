@@ -9,10 +9,15 @@ const LOGIN_ERROR_DESC = {
 export class ConnectForm extends React.Component {
   constructor(props) {
     super(props);
+
+    const url = new URL(window.location);
+    const base_uri = url.searchParams.get("base_uri");
+    const api_key = url.searchParams.get("api_key");
+
     this.state = {
       credentials: {
-        base_uri: "",
-        api_key: "",
+        base_uri: base_uri || "",
+        api_key: api_key || "",
         remember: false,
       },
       error: props.error,
