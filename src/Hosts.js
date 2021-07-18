@@ -76,7 +76,7 @@ const IPInfo = (props) => {
       </tbody>
     </table>
   ) : (
-    <span class="disabled">Disabled</span>
+    <span className="disabled">Disabled</span>
   );
   return <td className={td_class}>{cell_content}</td>;
 };
